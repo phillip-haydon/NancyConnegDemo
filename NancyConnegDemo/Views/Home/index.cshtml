@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title></title>
+  <style type="text/css">
+    th {
+      text-align: left;
+    }
+
+    .status {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Products</h2>
+
+  <p>Posted back using: <span class="status">@if ((bool)Model.Deleted) { @Html.Raw("Full Postback"); }</span></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 50px;">Id</th>
+        <th style="width: 90px;">Name</th>
+        <th style="width: 50px;">Price</th>
+        <th style="width: 150px;">&nbsp;</th>
+        <th style="width: 160px;">&nbsp;</th>
+      </tr>
+    </thead>
+
+    @foreach (var product in Model.Products)
+    {
+      <tr>
+        <td>@product.Id</td>
+        <td>@product.Name</td>
+        <td>@product.Price.ToString("c")</td>
+        <td><a href="/delete/@product.Id">Delete With JavaScript</a></td>
+        <td><a href="/delete/@product.Id">Delete Without JavaScript</a></td>
+      </tr>  
+    }
+  </table>
+
+  <script src="/Scripts/jquery-1.8.2.min.js"></script>
+  <script>
+    (function ($) {
+
+      $(document).on("click", 'a:contains(Delete With JavaScript)', function (e) {
+
+        e.preventDefault();
+
+        var that = $(this),
+            tr = that.closest('tr');
+
+        $.ajax({
+          url: this.href,
+          type: 'GET',
+          dataType: 'JSON',
+          contentType: 'application/json; charset=utf-8'
+        }).success(function (data) {
+          if (data.Deleted === true) {
+            tr.remove();
+            $('.status').text("Using JavaScript");
+          }
+        });
+
+      });
+
+    })(jQuery);
+  </script>
+</body>
+</html>
